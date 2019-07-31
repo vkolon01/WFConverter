@@ -11,8 +11,9 @@ export class PagesController {
 
     // Used for settings with multiple type values
     settingsTranslation = {
-        TFON: ['FONT', 'TFCS', 'TFSZ', 'TFST'],
-        TFST: ['TFBD', 'TFTS', 'TFUL'],
+        TFON: {settings: ['FONT', 'TFCS', 'TFSZ', 'TFST']},
+        TFST: {settings: ['TFBD', 'TFTS', 'TFUL']},
+        TFIT: {settings: ['OFSV', 'OFSH'], divider: ''},
     };
 
     valuesTranslation = {
@@ -21,6 +22,16 @@ export class PagesController {
             I: 'TFTS',
             U: 'TFUL',
             multiline: true,
+        },
+        OFSH: {
+            L: 'OSHL',
+            C: 'OSHC',
+            R: 'OSHR',
+        },
+        OFSV: {
+            T: 'OSVT',
+            C: 'OSVC',
+            B: 'OSVB',
         },
     };
 
@@ -128,16 +139,17 @@ export class PagesController {
 
             // get value array
             const itemValue = settings.mutable[item];
-            const settingValueArray = itemValue.split(/[,"]/).filter(el => el.length > 0);
 
-            if (this.settingsTranslation[item]) {
+            if (this.settingsTranslation[item] && this.settingsTranslation[item].settings) {
+                const valueDivider = this.settingsTranslation[item].divider || this.settingsTranslation[item].divider === '' ? `${this.settingsTranslation[item].divider}` : /[,"]/;
+                const settingValueArray = itemValue.split(valueDivider).filter(el => el.length > 0);
 
                 fileChanged = true;
-
                 // get setting names and apply the values in order
-                this.settingsTranslation[item].forEach((subSettingName, i) => {
+                this.settingsTranslation[item].settings.forEach((subSettingName, i) => {
                     if (settingValueArray[i]) {
                         const translatedSetting = this.valuesTranslation[subSettingName];
+                        // console.log('TRANSL', translatedSetting, settingValueArray, subSettingName)
                         if (translatedSetting) {
                             if (translatedSetting.multiline) {
                                 const settingCharacters = settingValueArray[i].split('');
@@ -152,11 +164,15 @@ export class PagesController {
                                     }
                                 });
                             } else if (translatedSetting[settingValueArray[i]]) {
-                                const translatedName = translatedSetting[settingValueArray[i]].name;
-                                newArr.mutable[translatedName] = translatedSetting[settingValueArray[i]].value;
+                                if (typeof translatedSetting[settingValueArray[i]] === 'string') {
+                                    newArr.fixed.push(translatedSetting[settingValueArray[i]]);
+                                } else {
+                                    const translatedName = translatedSetting[settingValueArray[i]].name;
+                                    newArr.mutable[translatedName] = translatedSetting[settingValueArray[i]].value;
+                                }
                             }
                         } else {
-                            // settings.mutable[subSettingName] = settingValueArray[i];
+                            newArr.mutable[subSettingName] = settingValueArray[i];
                         }
                     }
                 });
@@ -166,8 +182,7 @@ export class PagesController {
             }
 
         });
-        return newArr;
-
+        return fileChanged ? this.translateSettings(newArr) : newArr;
     }
 
     setSettings(settingsStr: string): ElementSettings {
@@ -185,11 +200,11 @@ export class PagesController {
             settings.mutable[settingName] = settingValue;
       });
 
-      console.log(settings);
+      console.log('BEFORE', settings);
 
       settings = this.translateSettings(settings);
 
-      console.log(settings);
+      console.log('AFTER', settings);
 
       return settings;
     }
@@ -247,7 +262,7 @@ export class PagesController {
                     connection = await oracledb.getConnection({
                         user : 'ROOT',
                         password : 'w3lcome',
-                        connectString : 'SteveTest22:1521/SteveTest22.kickstart.local'
+                        connectString : 'VitaliKolontko41:1521/aosdb01'
                     });
                 } catch (err) {
                     console.log("Error: ", err);

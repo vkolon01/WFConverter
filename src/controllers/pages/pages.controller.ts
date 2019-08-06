@@ -37,7 +37,7 @@ export class PagesController {
 
     settingMapping = {
         fixed: ['TFBD', 'TFTS', 'TFUL'],
-        mutable: ['PBRC', 'TFRC', 'TFON'],
+        variable: ['PBRC', 'TFRC', 'TFON'],
     };
 
     @Get(':pageNumber')
@@ -131,14 +131,14 @@ export class PagesController {
 
         let fileChanged = false;
         let newArr: ElementSettings = {
-            mutable: {},
+            variable: {},
             fixed: settings.fixed,
         };
 
-        Object.keys(settings.mutable).forEach(item => {
+        Object.keys(settings.variable).forEach(item => {
 
             // get value array
-            const itemValue = settings.mutable[item];
+            const itemValue = settings.variable[item];
 
             if (this.settingsTranslation[item] && this.settingsTranslation[item].settings) {
                 const valueDivider = this.settingsTranslation[item].divider || this.settingsTranslation[item].divider === '' ? `${this.settingsTranslation[item].divider}` : /[,"]/;
@@ -149,7 +149,6 @@ export class PagesController {
                 this.settingsTranslation[item].settings.forEach((subSettingName, i) => {
                     if (settingValueArray[i]) {
                         const translatedSetting = this.valuesTranslation[subSettingName];
-                        // console.log('TRANSL', translatedSetting, settingValueArray, subSettingName)
                         if (translatedSetting) {
                             if (translatedSetting.multiline) {
                                 const settingCharacters = settingValueArray[i].split('');
@@ -159,7 +158,7 @@ export class PagesController {
                                             newArr.fixed.push(translatedSetting[character]);
                                         } else {
                                             const translatedName = translatedSetting[character].name;
-                                            newArr.mutable[translatedName] = translatedSetting[character].value;
+                                            newArr.variable[translatedName] = translatedSetting[character].value;
                                         }
                                     }
                                 });
@@ -168,17 +167,17 @@ export class PagesController {
                                     newArr.fixed.push(translatedSetting[settingValueArray[i]]);
                                 } else {
                                     const translatedName = translatedSetting[settingValueArray[i]].name;
-                                    newArr.mutable[translatedName] = translatedSetting[settingValueArray[i]].value;
+                                    newArr.variable[translatedName] = translatedSetting[settingValueArray[i]].value;
                                 }
                             }
                         } else {
-                            newArr.mutable[subSettingName] = settingValueArray[i];
+                            newArr.variable[subSettingName] = settingValueArray[i];
                         }
                     }
                 });
 
             } else {
-               newArr.mutable[item] = itemValue;
+               newArr.variable[item] = itemValue;
             }
 
         });
@@ -191,20 +190,16 @@ export class PagesController {
       const settingsArr = settingsStr.split(';');
       let settings: ElementSettings = {
           fixed: [],
-          mutable: {},
+          variable: {},
       } as ElementSettings;
 
       settingsArr.forEach(setting => {
             const settingName = setting.split('=')[0];
             const settingValue = setting.split('=')[1];
-            settings.mutable[settingName] = settingValue;
+            settings.variable[settingName] = settingValue;
       });
 
-      console.log('BEFORE', settings);
-
       settings = this.translateSettings(settings);
-
-      console.log('AFTER', settings);
 
       return settings;
     }

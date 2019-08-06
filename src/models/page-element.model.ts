@@ -14,5 +14,5 @@ export class PageElement {
 
 export class ElementSettings {
     fixed: string[];
-    mutable: object;
+    variable: object;
 }

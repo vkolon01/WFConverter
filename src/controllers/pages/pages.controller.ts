@@ -211,9 +211,6 @@ export class PagesController {
         let bodyStr = elementStr.substring(elementStr.indexOf(')') + 1);
 
         // Remove only the last special character.
-        if (bodyStr.substr(0, 2) !== '\r') {
-          bodyStr = bodyStr.substring(0, bodyStr.length - 2);
-        }
 
         // get position
         const splitElement = positionStr.split(',');
@@ -225,12 +222,14 @@ export class PagesController {
           type: null,
           content: null,
         };
+
+
         if (bodyStr && bodyStr.charAt(0) !== ';') {
+
             body.type = bodyStr.charAt(0);
             if (bodyStr.length > 1) {
-
                 // Exclude the additional quotation marks
-                body.content = bodyStr.substring(2, bodyStr.length - 1);
+                body.content = bodyStr.substring(1, bodyStr.length).replace(/[";]/g, '');
             }
         }
         const elementObj: PageElement = {
@@ -251,6 +250,66 @@ export class PagesController {
 
     fetchPageByNumber(pageNumber) {
         return new Promise(async (resolve, reject) => {
+
+            let mockdata = `"800,600
+PBRC=98,114,155;CPBP=0732;CPNP=0
+URGC=226,230,239
+0,0,800,50(BORW=0;URGC=77,89,121)U;
+0,50,800,51(BORW=0;URGC=33,44,68)U;
+0,555,800,599(BORW=0;URGC=226,230,239)U;
+0,510,800,554(BORW=0;URGC=226,230,239)U;
+0,465,800,509(BORW=0;URGC=226,230,239)U;
+0,420,800,464(BORW=0;URGC=226,230,239)U;
+0,375,800,419(BORW=0;URGC=226,230,239)U;
+0,330,800,374(BORW=0;URGC=226,230,239)U;
+0,285,800,329(BORW=0;URGC=226,230,239)U;
+0,240,800,284(BORW=0;URGC=226,230,239)U;
+0,195,800,239(BORW=0;URGC=226,230,239)U;
+0,150,800,194(BORW=0;URGC=226,230,239)U;
+0,105,800,149(BORW=0;URGC=226,230,239)U;
+0,51,800,52(BORW=0;URGC=172,181,202)U;
+0,104,800,105(BORW=0;URGC=43,53,77)U;
+8,5,73,25(BORW=0;TFRC=214,218,228;TBRC=77,89,121;TFIT=CL;TFON="Arial"0,22,B)t;
+8,27,117,45(BORW=0;TFRC=214,218,228;TBRC=77,89,121;TFIT=CL;TFON="Arial"0,22,B)d;
+185,8,600,41(BORW=0;TFRC=255,255,255;TFFC=255,17,255,0,0,0;TFRS=R;TBRC=77,89,121;TBKS=R;TFIT=CC;TFON="Arial"0,44,B)T"ПРИЛЕТ";
+606,11,789,39(BORW=0;TFRC=214,218,228;TBRC=77,89,121;TFIT=CR;TFON="Arial"0,30,B)T"ARRIVALS";
+5,57,136,101(BORW=0;TFRC=226,230,239;TBRC=98,114,155;TFIT=CL;TFON="Arial"0,18,B)T"Авиакомпания
+Airline";
+144,57,208,101(BORW=0;TFRC=226,230,239;TBRC=98,114,155;TFIT=CL;TFON="Arial"0,18,B)T"Рейс
+Flight";
+224,57,282,101(BORW=0;TFRC=226,230,239;TBRC=98,114,155;TFIT=CL;TFON="Arial"0,18,B)T"Время
+Time";
+287,57,472,101(BORW=0;TFRC=226,230,239;TBRC=98,114,155;TFIT=CL;TFON="Arial"0,18,B)T"Первоначальный
+Origin";
+500,57,560,101(BORW=0;TFRC=226,230,239;TBRC=98,114,155;TFIT=CL;TFON="Arial"0,18,B)T"Выход
+Gate";
+632,57,763,101(BORW=0;TFRC=226,230,239;TBRC=98,114,155;TFIT=CL;TFON="Arial"0,18,B)T"Примечание
+Remarks";
+137,59,138,99(BORW=0;URGC=172,181,202)U;
+217,59,218,99(BORW=0;URGC=172,181,202)U;
+279,59,280,99(BORW=0;URGC=172,181,202)U;
+493,59,494,99(BORW=0;URGC=172,181,201)U;
+559,58,560,98(BORW=0;URGC=172,181,202)U;
+136,59,137,99(BORW=0;URGC=43,53,70)U;
+216,59,217,99(BORW=0;URGC=43,53,70)U;
+278,59,279,99(BORW=0;URGC=43,53,70)U;
+492,59,493,99(BORW=0;URGC=43,53,70)U;
+558,59,559,99(BORW=0;URGC=43,53,70)U;
+566,57,624,101(BORW=0;TFRC=226,230,239;TBRC=98,114,155;TFIT=CL;TFON="Arial"0,18,B)T"Время
+Latest";
+624,59,625,99(BORW=0;URGC=43,53,70)U;
+625,59,626,99(BORW=0;URGC=172,181,201)U
+M,11,45,0,105,136,149(BORW=3;BBRC=0,0,0;BORS=P;URGC=226,230,239;TFRC=0,0,0;TBRC=226,230,239;TFIT=CC;IBRC=226,230,239;IBFC=226,230,239,255,255,255;IFIT=SVHF;IMAR=N);
+139,108,221,148(BORW=0;TFRC=0,0,0;TBRC=226,230,239;TFIT=CC;TFON="Arial"0,20,B);
+224,106,284,146(BORW=0;TFRC=65,82,120;TBRC=226,230,239;TFIT=CL;TFON="Arial"0,21,B);
+284,106,487,146(BORW=0;CUTS=WR;TFRC=0,0,0;TBRC=226,230,239;TFIT=CL;TFON="Arial"0,18,B;TFNC="Arial"0,18,B);
+502,107,548,147(BORW=0;BORS=BR;TFRC=0,0,0;TBRC=226,230,239;TFIT=CC;TFON="Arial"0,20,B);
+563,107,612,147(BORW=0;TFRC=65,82,120;TBRC=226,230,239;TFIT=CL;TFON="Arial"0,21,B);
+630,107,794,147(BORW=0;CUTS=WR;TFRC=65,82,120;TBRC=226,230,239;TFIT=CL;TFON="Arial"0,18,B;TFNC="Arial"0,18,B)
+"`;
+
+            return resolve(mockdata);
+
             if (pageNumber) {
                 let connection;
                 try {
@@ -271,6 +330,8 @@ export class PagesController {
                                       reject(err.message);
                                   } else {
                                       if (result && result.rows && result.rows[0] && result.rows[0][0]) {
+
+
                                          return resolve(result.rows[0][0]);
                                       } else {
                                          return reject('no data');

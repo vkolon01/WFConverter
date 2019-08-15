@@ -103,10 +103,10 @@ export class PagesController {
                     multilineElements.push(elementObj);
                 });
 
-                // Page Definition
+                // Page Definition;
                 const resolution = {
-                    x: parseInt(pageResolution[0], 10),
-                    y: parseInt(pageResolution[1], 10),
+                    x: parseInt(pageResolution[0].replace(/["]/g, ''), 10),
+                    y: parseInt(pageResolution[1].replace(/["]/g, ''), 10),
                 };
                 const page: Page = {
                     resolution,
@@ -316,7 +316,7 @@ M,11,45,0,105,136,149(BORW=3;BBRC=0,0,0;BORS=P;URGC=226,230,239;TFRC=0,0,0;TBRC=
                     connection = await oracledb.getConnection({
                         user : 'ROOT',
                         password : 'w3lcome',
-                        connectString : 'VitaliKolontko41:1521/aosdb01'
+                        connectString : '10.172.253.14:1521/aosdb01.kickstart.local'
                     });
                 } catch (err) {
                     console.log("Error: ", err);

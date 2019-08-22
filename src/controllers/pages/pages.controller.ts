@@ -4,8 +4,6 @@ import {Page} from "../../models/page.model";
 import {ElementSettings} from '../../models/page-element.model';
 import oracledb = require('oracledb');
 
-
-
 @Controller('pages')
 export class PagesController {
 
@@ -37,6 +35,7 @@ export class PagesController {
             P: 'BSOS',
             W: 'BSIS',
             BR: 'BSSO',
+            N: '',
         },
     };
 
@@ -54,7 +53,7 @@ export class PagesController {
                 let multilineSettings;
 
                 // find the multiline section
-                let staticElementsStrArr = [];
+                let staticElementsStrArr = testPageArray;
                 let multilineElementsStrArr = [];
 
                 for (let i = 0; i < testPageArray.length; i++) {
@@ -86,8 +85,8 @@ export class PagesController {
                     const splitElement = element.split(',');
                     return this.checkIfElement(splitElement.slice(0, 4));
                 });
-                staticPageElements.forEach(element => {
 
+                staticPageElements.forEach(element => {
                     const elementObj = this.getElementSettings(element);
                     staticElements.push(elementObj);
                 });
@@ -117,7 +116,6 @@ export class PagesController {
                 };
 
                 // Send the page response
-                console.log(page.staticElements)
                 return page;
             } else {
                 return 'no data';
@@ -131,7 +129,7 @@ export class PagesController {
     translateSettings(settings): ElementSettings {
 
         let fileChanged = false;
-        let newArr: ElementSettings = {
+        const newArr: ElementSettings = {
             variable: {},
             fixed: settings.fixed,
         };
@@ -210,10 +208,14 @@ export class PagesController {
 
     getElementSettings(elementStr: string) {
 
-        const positionStr = elementStr.substring(0, elementStr.indexOf('('));
-        const settingsStr = elementStr.substring(elementStr.indexOf('(') + 1, elementStr.indexOf(')'));
-        let bodyStr = elementStr.substring(elementStr.indexOf(')') + 1);
+        const indexMatch = elementStr.match(/[a-zA-Z(]/);
+        const startIndex = indexMatch ? indexMatch.index : elementStr.length;
+        const startIndexChar = elementStr.charAt(startIndex);
 
+        const positionStr = elementStr.substring(0, startIndex);
+
+        const settingsStr = startIndexChar === '(' ? elementStr.substring(elementStr.indexOf('(') + 1, elementStr.indexOf(')')) : '';
+        const bodyStr = elementStr.substring(settingsStr.length > 0 ? elementStr.indexOf(')') + 1 : startIndex, elementStr.lastIndexOf('"'));
         // Remove only the last special character.
 
         // get position

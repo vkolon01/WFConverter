@@ -216,7 +216,7 @@ export class PagesController {
         const settingsStr = startIndexChar === '(' ? elementStr.substring(elementStr.indexOf('(') + 1, elementStr.indexOf(')')) : '';
 
         // hack to ensure only getting the after the settings part
-        const bodyStr = elementStr.split(`(${settingsStr})`)[1];
+        const bodyStr = elementStr.split(`${positionStr}${settingsStr ? '(' + settingsStr + ')' : ''}`)[1];
 
         // get position
         const splitElement = positionStr.split(',');
@@ -234,9 +234,13 @@ export class PagesController {
 
             body.type = bodyStr.charAt(0).replace('\r', '');
             if (bodyStr.length > 1) {
-                // Exclude the additional quotation marks
-                body.content = bodyStr.substring(1, bodyStr.length)
-                  .replace(/[";]/g, '')
+
+                let content = bodyStr.substring(1, bodyStr.length);
+                if (content.includes('"')) {
+                    content = content.split('"')[1];
+                }
+                body.content = content
+                  .replace(/[;]/g, '')
                   .replace('\r', '\n');
             }
         }

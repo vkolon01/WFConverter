@@ -73,7 +73,6 @@ export class PagesController {
                         // Divide the static and multiline elements into two different arrays.
                         staticElementsStrArr = testPageArray.slice(0, i);
                         multilineElementsStrArr = testPageArray.slice(i);
-
                     }
                 }
 
@@ -215,8 +214,9 @@ export class PagesController {
         const positionStr = elementStr.substring(0, startIndex);
 
         const settingsStr = startIndexChar === '(' ? elementStr.substring(elementStr.indexOf('(') + 1, elementStr.indexOf(')')) : '';
-        const bodyStr = elementStr.substring(settingsStr.length > 0 ? elementStr.indexOf(')') + 1 : startIndex, elementStr.lastIndexOf('"'));
-        // Remove only the last special character.
+
+        // hack to ensure only getting the after the settings part
+        const bodyStr = elementStr.split(`(${settingsStr})`)[1];
 
         // get position
         const splitElement = positionStr.split(',');
@@ -232,7 +232,7 @@ export class PagesController {
 
         if (bodyStr && bodyStr.charAt(0) !== ';') {
 
-            body.type = bodyStr.charAt(0);
+            body.type = bodyStr.charAt(0).replace('\r', '');
             if (bodyStr.length > 1) {
                 // Exclude the additional quotation marks
                 body.content = bodyStr.substring(1, bodyStr.length)
@@ -253,6 +253,7 @@ export class PagesController {
         if (body.type) {
           elementObj.body = body;
         }
+
         return elementObj;
     }
 
